@@ -1,5 +1,24 @@
 {
-  "admin": "pass",
-  "test": "passone"
+    "admin": {
+        "password": "pass",
+        "stats": {
+            "armor": 10,
+            "experience": 0,
+            "gold": 250,
+            "hp": 100,
+            "level": 1,
+            "magic": 5
+        }
+    },
+    "test": {
+        "password": "passone",
+        "stats": {
+            "hp": 80,
+            "armor": 5,
+            "magic": 20,
+            "gold": 100,
+            "level": 2,
+            "experience": 30
+        }
+    }
 }
-
