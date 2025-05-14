@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>New Sprite Animation</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #gameCanvas { display: block; background-color: #A7D6A7; }
+  </style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 800;
+  canvas.height = 600;
+
+  const spriteSheet = new Image();
+  spriteSheet.src = '/static/male_new_walkcycle.png';  // make sure you place the sprite in this path
+
+  const spriteWidth = 64;   // width of one frame
+  const spriteHeight = 64;  // height of one frame (feet fully visible)
+  const totalFrames = 9;
+
+  const moveSpeed = 100;
+  let lastUpdateTime = Date.now();
+
+  const player = {
+    x: 100,
+    y: 100,
+    targetX: null,
+    targetY: null,
+    moving: false,
+    frame: 0,
+    direction: 'down' // up, down, left, right
+  };
+
+  canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    player.targetX = touch.pageX - canvas.offsetLeft;
+    player.targetY = touch.pageY - canvas.offsetTop;
+    player.moving = true;
+  });
+
+  function animate() {
+    const now = Date.now();
+    const deltaTime = (now - lastUpdateTime) / 1000;
+
+    if (player.moving) {
+      const dx = player.targetX - player.x;
+      const dy = player.targetY - player.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      // Direction logic
+      if (Math.abs(dx) > Math.abs(dy)) {
+        player.direction = dx > 0 ? 'right' : 'left';
+      } else {
+        player.direction = dy > 0 ? 'down' : 'up';
+      }
+
+      if (dist > moveSpeed * deltaTime) {
+        player.x += (dx / dist) * moveSpeed * deltaTime;
+        player.y += (dy / dist) * moveSpeed * deltaTime;
+      } else {
+        player.x = player.targetX;
+        player.y = player.targetY;
+        player.moving = false;
+      }
+
+      player.frame = Math.floor(Date.now() / 100) % totalFrames;
+    } else {
+      player.frame = 0;
+    }
+
+    lastUpdateTime = now;
+    render();
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let row;
+    switch (player.direction) {
+      case 'up': row = 0; break;
+      case 'left': row = 1; break;
+      case 'down': row = 2; break;
+      case 'right': row = 3; break;
+    }
+
+    const spriteX = player.frame * spriteWidth;
+    const spriteY = row * spriteHeight;
+
+    ctx.drawImage(spriteSheet, spriteX, spriteY, spriteWidth, spriteHeight,
+                  player.x, player.y, spriteWidth, spriteHeight);
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+</body>
+</html>
+
